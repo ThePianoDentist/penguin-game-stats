@@ -11,7 +11,8 @@ import (
 
 var db = dbClient()
 var singleplayerCollection = db.Database("Stats").Collection("singleplayer")
-var multiplayerCollection = db.Database("Stats").Collection("multiplayer")
+var multiplayerMatchCollection = db.Database("Stats").Collection("multiplayerMatch")
+var multiplayerPlayerResultCollection = db.Database("Stats").Collection("multiplayerPlayerResult")
 
 type Response struct {
 	Status string
@@ -49,13 +50,13 @@ func InsertSingleplayer(w http.ResponseWriter, r *http.Request) {
 
 func InsertMultiplayer(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var asJson interface{}
-	err := decoder.Decode(&asJson)
+	var res db.MultiplayerResult
+	err := decoder.Decode(&res)
 	if err != nil {
 		errResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	insertRes, err := multiplayerCollection.InsertOne(context.TODO(), asJson)
+	insertRes, err := multiplayerCollection.InsertOne(context.TODO(), res)
 	if err != nil {
 		errResponse(w, err.Error(), http.StatusInternalServerError)
 		return

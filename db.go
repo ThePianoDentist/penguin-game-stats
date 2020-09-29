@@ -22,3 +22,22 @@ func dbClient() *mongo.Client {
 	fmt.Println("Connected to MongoDB!")
 	return client
 }
+
+type MultiplayerMatch struct{
+  CreatedAt  uint64
+  FinishedAt uint64
+  Type string
+  TeamOneScore uint32
+  TeamTwoScore uint32
+  TeamOnePlayers []PlayerResult
+  TeamTwoPlayers []PlayerResult
+}
+
+type PlayerResult struct{
+  Kills uint32
+  Deaths uint32
+  DaggerKills uint32
+  DaggerReflectionKills uint32
+  ShockwaveKills uint32
+  RightClickKills uint32
+}
