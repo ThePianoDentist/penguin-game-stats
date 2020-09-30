@@ -23,21 +23,24 @@ func dbClient() *mongo.Client {
 	return client
 }
 
-type MultiplayerMatch struct{
-  CreatedAt  uint64
-  FinishedAt uint64
-  Type string
-  TeamOneScore uint32
-  TeamTwoScore uint32
-  TeamOnePlayers []PlayerResult
-  TeamTwoPlayers []PlayerResult
+type MultiplayerResult struct {
+	CreatedAt      uint64
+	FinishedAt     uint64
+	Type           string
+	Cancelled      bool
+	TeamOneScore   uint32
+	TeamTwoScore   uint32
+	TeamOnePlayers []PlayerResult
+	TeamTwoPlayers []PlayerResult
 }
 
-type PlayerResult struct{
-  Kills uint32
-  Deaths uint32
-  DaggerKills uint32
-  DaggerReflectionKills uint32
-  ShockwaveKills uint32
-  RightClickKills uint32
+type PlayerResult struct {
+	PlayerID              string
+	Win                   int32 // 0 for cancelled. +1 for win. -1 for loss
+	Kills                 uint32
+	Deaths                uint32
+	DaggerKills           uint32
+	DaggerReflectionKills uint32
+	ShockwaveKills        uint32
+	RightClickKills       uint32
 }

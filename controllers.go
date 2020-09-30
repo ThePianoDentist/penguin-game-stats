@@ -12,7 +12,7 @@ import (
 var db = dbClient()
 var singleplayerCollection = db.Database("Stats").Collection("singleplayer")
 var multiplayerMatchCollection = db.Database("Stats").Collection("multiplayerMatch")
-var multiplayerPlayerResultCollection = db.Database("Stats").Collection("multiplayerPlayerResult")
+var multiplayerPlayerCollection = db.Database("Stats").Collection("multiplayerPlayerResult")
 
 type Response struct {
 	Status string
@@ -50,18 +50,35 @@ func InsertSingleplayer(w http.ResponseWriter, r *http.Request) {
 
 func InsertMultiplayer(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var res db.MultiplayerResult
+	var res MultiplayerResult
 	err := decoder.Decode(&res)
 	if err != nil {
 		errResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	insertRes, err := multiplayerCollection.InsertOne(context.TODO(), res)
+	insertRes, err := multiplayerMatchCollection.InsertOne(context.TODO(), res)
 	if err != nil {
 		errResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	log.Printf("Inserted multiplayer: %v+", insertRes)
+
+	for _, player := range res.TeamOnePlayers {
+		insertRes, err := multiplayerPlayerCollection.InsertOne(context.TODO(), player)
+		if err != nil {
+			errResponse(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Inserted player: %v+", insertRes)
+	}
+	for _, player := range res.TeamTwoPlayers {
+		insertRes, err := multiplayerPlayerCollection.InsertOne(context.TODO(), player)
+		if err != nil {
+			errResponse(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Inserted player: %v+", insertRes)
+	}
 	okResponse(w, fmt.Sprintf("%v", insertRes), http.StatusCreated)
 }
 
